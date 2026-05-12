@@ -1,0 +1,46 @@
+const { Admission, Patient, Ward, Doctor, Nurse } = require('../models');
+const { asyncHandler } = require('../middleware/errorHandler');
+const { generateId, paginate } = require('../utils/helpers');
+
+const getAdmissions = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, status } = req.query;
+  const { offset, limit: lim } = paginate(page, limit);
+  const where = {};
+  if (status) where.status = status;
+  const { count, rows } = await Admission.findAndCountAll({
+    where, limit: lim, offset,
+    include: [
+      { model: Patient, as: 'patient', attributes: ['name', 'patientId', 'age', 'gender', 'bloodGroup', 'phone'] },
+      { model: Ward, as: 'ward', attributes: ['wardName', 'wardNumber', 'type'] },
+      { model: Doctor, as: 'doctor', include: [{ model: require('../models').User, as: 'user', attributes: ['name'] }] },
+      { model: Nurse, as: 'nurse', include: [{ model: require('../models').User, as: 'user', attributes: ['name'] }] },
+    ],
+    order: [['createdAt', 'DESC']],
+  });
+  res.json({ success: true, data: rows, pagination: { total: count, page: +page, pages: Math.ceil(count / lim) } });
+});
+
+const createAdmission = asyncHandler(async (req, res) => {
+  const ward = await Ward.findByPk(req.body.wardId);
+  if (!ward) return res.status(404).json({ success: false, message: 'Ward not found' });
+  if (ward.occupiedBeds >= ward.totalBeds) {
+    return res.status(400).json({ success: false, message: 'No beds available in this ward' });
+  }
+  const admission = await Admission.create({
+    ...req.body,
+    admissionId: generateId('ADM'),
+    admittedBy: req.user.id,
+  });
+  await ward.update({ occupiedBeds: ward.occupiedBeds + 1 });
+  await Patient.update({ status: 'admitted' }, { where: { id: req.body.patientId } });
+  res.status(201).json({ success: true, message: 'Patient admitted', data: admission });
+});
+
+const updateAdmission = asyncHandler(async (req, res) => {
+  const admission = await Admission.findByPk(req.params.id);
+  if (!admission) return res.status(404).json({ success: false, message: 'Admission not found' });
+  await admission.update(req.body);
+  res.json({ success: true, message: 'Admission updated', data: admission });
+});
+
+module.exports = { getAdmissions, createAdmission, updateAdmission };
