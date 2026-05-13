@@ -98,10 +98,10 @@ export default function Login() {
             <p className="text-xs text-slate-500 mb-3 font-medium">Quick Login (Demo)</p>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { label: 'Admin',        email: 'admin@hospital.com',        color: 'bg-blue-50 text-blue-700 border-blue-200' },
-                { label: 'Doctor',       email: 'dr.ahmed@hospital.com',     color: 'bg-green-50 text-green-700 border-green-200' },
-                { label: 'Nurse',        email: 'nurse.fatima@hospital.com', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-                { label: 'Receptionist', email: 'reception@hospital.com',    color: 'bg-orange-50 text-orange-700 border-orange-200' },
+                { label: 'Admin',        email: 'admin@hospital.com',         pass: 'Admin1234',     color: 'bg-blue-50 text-blue-700 border-blue-200' },
+                { label: 'Doctor',       email: 'doctor@hospital.com',        pass: 'Doctor1234',       color: 'bg-green-50 text-green-700 border-green-200' },
+                { label: 'Nurse',        email: 'nurse@hospital.com',         pass: 'Nurse1234',        color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                { label: 'Receptionist', email: 'reception@hospital.com',     pass: 'Reception1234',    color: 'bg-orange-50 text-orange-700 border-orange-200' },
               ].map(({ label, email, color }) => (
                 <button
                   key={label}
