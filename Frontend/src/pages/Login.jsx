@@ -7,29 +7,29 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     try {
-      const user = await login(form.email, form.password);
+      await login(form.email, form.password);
       navigate('/dashboard');
-    } catch {
-      // error handled by axios interceptor
+    } catch (err) {
+      setError('Wrong password. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const quickLogin = (email, password) => setForm({ email, password });
+  const quickLogin = (email) => setForm({ email, password: '' });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <span className="text-blue-700 font-bold text-3xl">H</span>
@@ -37,23 +37,13 @@ export default function Login() {
           <h1 className="text-white text-2xl font-bold">Smart Hospital</h1>
           <p className="text-blue-200 text-sm mt-1">Management System</p>
         </div>
-
-        {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <h2 className="text-xl font-bold text-slate-800 mb-6">Sign In</h2>
-
           <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* ✅ Email Field */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
               <div className="relative flex items-center">
-                <FiMail
-                  className="absolute left-3 text-slate-400 pointer-events-none z-10"
-                  size={16}
-                />
+                <FiMail className="absolute left-3 text-slate-400 pointer-events-none z-10" size={16} />
                 <input
                   type="email"
                   required
@@ -65,17 +55,10 @@ export default function Login() {
                 />
               </div>
             </div>
-
-            {/* ✅ Password Field */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
               <div className="relative flex items-center">
-                <FiLock
-                  className="absolute left-3 text-slate-400 pointer-events-none z-10"
-                  size={16}
-                />
+                <FiLock className="absolute left-3 text-slate-400 pointer-events-none z-10" size={16} />
                 <input
                   type={showPass ? 'text' : 'password'}
                   required
@@ -95,7 +78,12 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Sign In Button */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-2.5 text-center">
+                ⚠️ {error}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
@@ -103,7 +91,6 @@ export default function Login() {
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
-
           </form>
 
           {/* Quick Login */}
@@ -111,11 +98,11 @@ export default function Login() {
             <p className="text-xs text-slate-500 mb-3 font-medium">Quick Login (Demo)</p>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { label: 'Admin',        email: 'admin@hospital.com',          pass: 'Admin@123456',    color: 'bg-blue-50 text-blue-700 border-blue-200' },
-                { label: 'Doctor',       email: 'dr.ahmed@hospital.com',       pass: 'Doctor@123',      color: 'bg-green-50 text-green-700 border-green-200' },
-                { label: 'Nurse',        email: 'nurse.fatima@hospital.com',   pass: 'Nurse@123',       color: 'bg-purple-50 text-purple-700 border-purple-200' },
-                { label: 'Receptionist', email: 'reception@hospital.com',      pass: 'Reception@123',   color: 'bg-orange-50 text-orange-700 border-orange-200' },
-              ].map(({ label, email, pass, color }) => (
+                { label: 'Admin',        email: 'admin@hospital.com',        color: 'bg-blue-50 text-blue-700 border-blue-200' },
+                { label: 'Doctor',       email: 'dr.ahmed@hospital.com',     color: 'bg-green-50 text-green-700 border-green-200' },
+                { label: 'Nurse',        email: 'nurse.fatima@hospital.com', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                { label: 'Receptionist', email: 'reception@hospital.com',    color: 'bg-orange-50 text-orange-700 border-orange-200' },
+              ].map(({ label, email, color }) => (
                 <button
                   key={label}
                   onClick={() => quickLogin(email)}
