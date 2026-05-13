@@ -2,7 +2,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://smart-hospital-backend-tqk9.onrender.com/api',
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 });
